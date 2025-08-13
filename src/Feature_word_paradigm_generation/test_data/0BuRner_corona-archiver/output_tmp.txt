@@ -1,0 +1,3 @@
+
+
+非AI技术领域。原因是该项目专注于Corona SDK资源文件的解包与反编译功能，涉及Android APK文件处理及CAR格式资源管理。代码使用Python编写，并包含核心处理脚本corona-archiver.py。特征词：（Corona SDK, 文件解包, 反编译工具, CAR格式, Lua脚本处理, Android APK）

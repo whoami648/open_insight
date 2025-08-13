@@ -1,0 +1,51 @@
+{
+    "doc_number": 9,
+    "folder_document_details": [
+        {
+            "name": "README.md",
+            "path": "YiDong-0.0.21/README.md",
+            "content": "# YiDong\n\n> \"The difficult thing isn't living with other people, it's understanding them.\"\n> \n> -- Jos\u00e9 Saramago, Blindness\n\n**YiDong** is designed to facilitate seamless interaction with the Yi series\nmulti-modal models, enabling users to perform a variety of tasks including image/video\ncomprehension, creation, and modification.\n\n## Prerequisites\n\nMake sure you have a valid API key.\n\n\u26a0\ufe0f: This project is still in the early test stage and is open to invited users only. Please contact yi@01.ai if you want to join the waitlist.\n\n## Getting Started\n\nWe provide SDK in the following programming languages:\n\n- Python\n\n### Python\n\n1. Install the `yidong` package:\n\n    ```bash\n    pip install yidong\n    ```\n\n2. Initialize the client\n\n    ```py\n    from yidong import YiDong\n\n    yd = YiDong(api_key=\"YOUR_API_KEY\")\n    ```\n\n    You can also set the `YIDONG_API_KEY` environment variable instead and left the `api_key` param empty.\n\n3. Upload resources\n\n    ```py\n    rid = yd.add_resource(\"path/to/your/video.mp4\")\n    # \"b525d791a0a5a023\"\n    ```\n\n    A resource ID will be returned once the upload is completed. Then you can fetch the resource details:\n\n    ```py\n    yd.get_resource(rid)\n\n    # Resource(\n    #     id='b525d791a0a5a023',\n    #     mime='video/mp4',\n    #     name='a.mp4',\n    #     source=ResourceFromLocalUpload(type='local_upload', path='~/Downloads/a.mp4'),\n    #     uploaded_at='2024-10-25T18:23:13.021277',\n    #     created_at='2024-10-25T18:23:14.204159',\n    #     updated_at='2024-10-25T18:23:15.163147',\n    #     url='https://...',\n    #     meta={...}\n    # )\n    ```\n\n4. Perform tasks\n\n    ```py\n    t = yd.video_summary('b525d791a0a5a023')\n    # TaskRef(\"e5622d45e5ad41bfa961b09c0b84835b\")\n    ```\n\n    A task reference will be returned immediately. To fetch the task result:\n\n    ```py\n    t()\n    # VideoSummaryTaskResult(\n    #     type='video_summary',\n    #     video_id='e24bb328df3a5bb9',\n    #     video_summary=Summary(\n    #         summary='...',\n    #         meta={}\n    #     ),\n    #     chapters=[Chapter(start=0.0, stop=10.0), Chapter(start=10.0, stop=13.0)],\n    #     chapter_summaries=[\n    #         Summary(\n    #             summary='...',\n    #             meta={}\n    #         ),\n    #         Summary(\n    #             summary='...',\n    #             meta={}\n    #         )\n    #     ]\n    # )\n    ```\n\n    If you have a webhook set up, you will receive a notification once the task is completed. (TODO: verify this)\n\n    You may find all available tasks in the docs(TODO: setup docs).\n\n5. Live interaction\n\n    (TODO: Add chat interface)\n\nFor more examples, please visit the [Gradio Example(TODO: Add Link)]().\n\n#### CLI\n\nYou can also use the command line interface to perform tasks demonstrated above:\n\n```bash\n$ yidong -h\n\n$ yidong add_resource --file ~/Downloads/a.mp4\n# 'b525d791a0a5a023'\n\n$ yidong video_summary b525d791a0a5a023\n# TaskRef(\"e5622d45e5ad41bfa961b09c0b84835b\")\n\n$ yidong get_task e5622d45e5ad41bfa961b09c0b84835b\n```\n"
+        },
+        {
+            "name": ".pre-commit-config.yaml",
+            "path": "YiDong-0.0.21/.pre-commit-config.yaml",
+            "content": "repos:\n  - repo: https://github.com/psf/black\n    rev: 23.7.0\n    hooks:\n      - id: black\n        # It is recommended to specify the latest version of Python\n        # supported by your project here, or alternatively use\n        # pre-commit's default_language_version, see\n        # https://pre-commit.com/#top_level-default_language_version\n        language_version: python3.11\n  - repo: https://github.com/pycqa/isort\n    rev: 5.12.0\n    hooks:\n      - id: isort\n        name: isort (python)\n        args: [\"--profile\", \"black\", \"--filter-files\"]\n  - repo: https://github.com/PyCQA/autoflake\n    rev: v2.2.1\n    hooks:\n      - id: autoflake\n        args: [--remove-all-unused-imports, --remove-unused-variables, --expand-star-imports, --ignore-init-module-imports, -r, --in-place]"
+        },
+        {
+            "name": "README.md",
+            "path": "YiDong-0.0.21/example/gradio/README.md",
+            "content": "---\ntitle: YiDong\nemoji: \ud83d\udee1\ufe0f\ncolorFrom: indigo\ncolorTo: purple\nsdk: gradio\nsdk_version: 5.4.0\nhf_oauth: true\nhf_oauth_scopes:\n- email\n---\n\nFor more details, check out: [YiDong](https://github.com/01-ai/yidong)"
+        },
+        {
+            "name": "README.md",
+            "path": "YiDong-0.0.21/example/cli/README.md",
+            "content": ""
+        },
+        {
+            "name": "video_summary.yml",
+            "path": "YiDong-0.0.21/example/cli/video_summary.yml",
+            "content": ""
+        },
+        {
+            "name": "pypi.yml",
+            "path": "YiDong-0.0.21/.github/workflows/pypi.yml",
+            "content": "name: Release\n\non:\n  push:\n    tags:\n      - '*.*.*'\n\npermissions:\n  contents: read\n\njobs:\n  pypi-publish:\n    name: Upload release to PyPI\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: ./client/py\n    environment:\n      name: pypi\n      url: https://pypi.org/project/yidong/\n    permissions:\n      id-token: write\n    steps:\n      - name: Checkout code\n        uses: actions/checkout@v4\n\n      - name: Set up Python 3.10\n        uses: actions/setup-python@v5\n        with:\n          python-version: \"3.10\"\n\n      - name: Install Poetry\n        run: |\n          curl -sSL https://install.python-poetry.org | python - -y\n\n      - name: Update PATH\n        run: echo \"$HOME/.local/bin\" >> $GITHUB_PATH\n\n      - name: Update Poetry configuration\n        run: poetry config virtualenvs.create false\n\n      - name: Install dependencies\n        run: poetry install --sync --no-interaction\n\n      - name: Package project\n        run: poetry build\n\n      - name: Publish package distributions to PyPI\n        uses: pypa/gh-action-pypi-publish@release/v1\n        with:\n          packages-dir: client/py/dist/"
+        },
+        {
+            "name": "hf.yml",
+            "path": "YiDong-0.0.21/.github/workflows/hf.yml",
+            "content": "name: Sync Gradio Demo\n\non:\n  push:\n    branches:\n      - main\n\njobs:\n  detect-changes:\n    runs-on: ubuntu-latest\n    outputs:\n      is_hf_changed: ${{ steps.changed-files.outputs.hf_any_changed }}\n    steps:\n      - name: Checkout Repository\n        uses: actions/checkout@v4\n        with:\n          fetch-depth: 0\n      - name: Get changed files\n        id: changed-files\n        uses: tj-actions/changed-files@v41\n        with:\n          files_yaml: |\n            hf:\n              - example/gradio/**\n  sync-hf:\n    runs-on: ubuntu-latest\n    needs: detect-changes\n    if: needs.detect-changes.outputs.is_hf_changed == 'true' \n    steps:\n      - uses: actions/checkout@v4\n      - name: Sync Gradio Demo\n        run: |\n          git config --global user.email \"yi@01.ai\"\n          git config --global user.name \"Yi Team\"\n          git clone  https://${{ secrets.HF_USER }}:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/01-ai/YiDong 01AI_HF_YIDONG\n          cd 01AI_HF_YIDONG\n          cp -r ../example/gradio/* .\n          git add .\n          git commit --dry-run || exit 0\n          git commit -m \"Auto Sync from ${{ github.repositoryUrl}}/commit/${{ github.sha}}\"\n          git push"
+        },
+        {
+            "name": "README.md",
+            "path": "YiDong-0.0.21/client/py/README.md",
+            "content": "# YiDong Python Client SDK"
+        },
+        {
+            "name": "config.yml",
+            "path": "YiDong-0.0.21/client/py/config.yml",
+            "content": "t:\n  type: ping\n"
+        }
+    ],
+    "links_document_details": []
+}

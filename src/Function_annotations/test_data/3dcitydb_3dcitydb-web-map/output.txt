@@ -1,0 +1,16 @@
+#### **1. 项目相关性描述**  
+            - **主要功能与定位**：提供基于Web的高性能三维城市模型可视化与交互探索工具；支持KML/glTF/CZML/GeoJSON/Cesium 3D Tiles/I3S等多种数据格式；集成外部主题数据源（PostgreSQL/PostgREST/Google Spreadsheets/OGC Feature API）。  
+            - **解决的问题领域**：高效显示与管理大规模语义化三维城市模型及地理空间数据；支持动态加载与卸载大体量三维模型；实现多层叠加分析及主题数据联动查询。  
+            - **关联系统**：基于Cesium引擎实现三维渲染；兼容WMS/WMTS地图服务及Bing Maps/OpenStreetMap第三方地图平台；通过WebGL实现硬件加速渲染并适配移动端交互需求  
+
+            #### **2. 技术栈**  
+            - **核心框架与库**：Cesium Virtual Globe（用于三维渲染） | jQuery（UI交互） | Flatpickr（日期选择器） | Autolinker（链接解析）  
+            - **基础设施/平台**：WebGL图形库（硬件加速） | HTTPS协议（Geolocation API安全传输） | OAuth认证机制（Google Spreadsheets访问）  
+            - **依赖项**：PostgREST REST API接口 | Google Sheets API接口 | ION/Bing Maps Token授权系统；需配置`ionToken`或`bingToken`参数以启用地形图层或地图服务功能  
+
+            #### **3. 应用场景**  
+            - **主要场景**：城市规划建模分析｜地理信息系统(GIS)可视化展示｜建筑信息管理(BIM)协同设计｜场景链接共享视角参数及图层状态配置文件(含相机位置/阴影设置等)进行协作编辑与成果复现  
+            - **适用行业或领域**：智慧城市开发部门｜国土测绘机构｜建筑设计院所及相关科研单位需处理大规模语义化三维地理空间数据时的应用场景  
+
+            #### **4. 技术分类特征词**
+            - 关键词：Cesium Virtual Globe, WebGL, KML/glTF, OGC CityGML, WMS/WMTS Imagery Layer, Thematic Data Integration, Shadow Visualization, PostgreSQL
