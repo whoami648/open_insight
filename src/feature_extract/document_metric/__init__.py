@@ -1,18 +1,8 @@
 '''
-Descripttion: 
-version: V1.0
-Author: zyx
-Date: 2025-03-04 18:01:38
-LastEditors: zyx
-LastEditTime: 2025-03-26 17:04:36
-'''
-'''
-Descripttion: 
-version: V1.0
-Author: zyx
-Date: 2025-03-04 10:23:24
-LastEditors: zyx
-LastEditTime: 2025-03-20 17:04:55
+description:get the documentation quality, documentation number, Chinese documentation files, and organizational contribution of a repository
+lasst_modified:2025-8-14
+author:zhangyixiang
+version:1.0.0
 '''
 from document_metric.doc_quarty import doc_quarty_all
 # from document_metric.doc_chinese_support import doc_chinexe_support_git
@@ -20,7 +10,17 @@ from document_metric.doc_num import get_documentation_links_from_repo
 # from document_metric.organizational_contribution import organizational_contribution
 from document_metric.utils import save_json
 import os
+import configparser
+config = configparser.ConfigParser()
+config.read("config.ini")  # 假设文件名为 config，但没有后suffix
+print(config.sections())  # 输出为空列表 []
+TMP_PATH = config.get("OPEN_CHECKService", "tmp_path", fallback="/tmp")
+JSON_REPOPATH = os.path.join(TMP_PATH, "json_repo")
+if not os.path.exists(JSON_REPOPATH):
+    os.makedirs(JSON_REPOPATH)
 PATH = os.path.dirname(os.path.abspath(__file__))
+
+
 class Industry_Support:
     '''get the documentation quality, documentation number, Chinese documentation files, and organizational contribution of a repository'''
 
@@ -54,7 +54,7 @@ class Industry_Support:
             #     ans["doc_quarty_details"][key] = {}
             # ans["doc_quarty_details"][key]["doc_quarty_details"] = doc_quarty["doc_quarty_details"]
         
-        save_json(ans,os.path.join(PATH,"doc_quarty.json"))
+        # save_json(ans,os.path.join(PATH,"doc_quarty.json"))
 
         return ans # {"doc_quarty":0, "doc_quarty_details":{}}
 

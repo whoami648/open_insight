@@ -96,7 +96,7 @@ class GitHubMetadata:
 
                 }
             },
-            # "_source": ["repository_url", "language", "version", "release_notes", "repo_name", "commit_message", "issues"],
+            "_source": ["repository_url", "language", "version", "release_notes", "repo_name", "commit_message", "issues"],
             "size": 1000
         }
         

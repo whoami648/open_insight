@@ -6,8 +6,14 @@ from opensearchpy import OpenSearch
 # code = "opensearch"
 
 import pandas as pd
+import configparser
+import shutil
 
-OPENSEARCH = ""
+config = configparser.ConfigParser()
+config.read("config.ini")  # 假设文件名为 config，但没有后缀
+print(config.sections())  # 输出为空列表 []
+OPENSEARCH = config.get("OPEN_CHECKService", "open_search_url_topics", fallback="")
+
 
 def get_opensearch_client(opensearch_url = OPENSEARCH):
     

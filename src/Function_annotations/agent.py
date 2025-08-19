@@ -7,13 +7,21 @@ from multiprocessing import Pool, cpu_count
 from markdown_filter import MarkdownFilter
 import shutil
 from tqdm import tqdm
+import configparser
+config = configparser.ConfigParser()
+config.read("config.ini") # 假设文件名为 config，但没有后缀
+
+MODEL_NAME = config.get("DEFAULT", "model_name", fallback="")
+BASE_URL = config.get("DEFAULT", "base_url", fallback="")
+GITEE_AI_API_KEY = config.get("DEFAULT", "GITEE_AI_API_KEY", fallback="")
+
 class Doc_agent:
     def __init__(self, path=r"document_data"):
         self.path = path
         self.doc = read_json_file(self.path)
-        self.model_name = "Qwen3-8b"
-        self.base_url = "https://ai.gitee.com/v1"
-        self.GITEE_AI_API_KEY = "LV41QCCDGLTQLUUUBAM8KXZKCQOS4ZTUTQDGH461"
+        self.model_name = MODEL_NAME
+        self.base_url = BASE_URL
+        self.GITEE_AI_API_KEY = GITEE_AI_API_KEY
 
     def filter_documents(self):
         """Filter documents based on a keyword."""
@@ -124,7 +132,7 @@ class Doc_agent:
 
             response = client.chat.completions.create(
                 messages=messages,
-                model="Qwen3-8B",
+                model=self.model_name,
                 stream=True,
                 max_tokens=1024,
                 temperature=0.5,

@@ -124,5 +124,5 @@ if __name__ == "__main__":
     # daochu_data()
     # Example usage of MultiProcessTemplate
 
-    delete_oldest_dirs("/home/yixiang/zyx1/Agent_test/opensource_insight/tmp/repos_tmp", 1000)
+    delete_oldest_dirs("", 1000)
 

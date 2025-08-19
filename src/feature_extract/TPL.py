@@ -1,8 +1,4 @@
-"""请你写一个脚本，目标是通过http://deps.dev/api/v3/links?url={url}获取依赖信息，并将结果保存到一个JSON文件中。脚本需要包含以下功能
-1. 接受一个URL作为输入参数。
-2. 发送HTTP GET请求到http://deps.dev/api/v3/links?url={url}。
-3. 如果请求成功，解析返回的JSON数据。
-4. 将解析后的数据保存到一个名为`dependencies.json`的文件中。"""
+""""""
 
 import requests
 import json
@@ -21,6 +17,8 @@ def fetch_dependencies(package_name, version,language):
     pypi_api_url = f"https://deps.dev/_/s/pypi/p/{package_name}/v/{version}/dependencies"
     npm_api_url = f"https://deps.dev/_/s/npm/p/{package_name}/v/{version}/dependencies"
     maven_api_url = f"https://deps.dev/_/s/maven/p/{package_name}/v/{version}/dependencies"
+    go_api_url = f"https://deps.dev/_/s/go/p/{package_name}/v/{version}/dependencies"
+    c_api_url = f"https://deps.dev/_/s/c/p/{package_name}/v/{version}/dependencies"
 
     match language:
         case "python":
@@ -57,7 +55,7 @@ def fetch_dependencies(package_name, version,language):
             ans["description"] = dependency.get("description", "")
             res["dependencies"].append(ans)
 
-        save_name = os.path.join(r"/home/yixiang/zyx1/Agent_test/opensource_insight/data/TPC", f"{package_name}-{version}_dependencies.json")
+        save_name = os.path.join( f"{package_name}-{version}_dependencies.json")
         with open(save_name, 'w') as json_file:
             json.dump(res, json_file, indent=4)
         
@@ -78,7 +76,7 @@ def fetch_dependencies(package_name, version,language):
         return False
     
 def solve():
-    repo_csv ="/home/yixiang/zyx1/Agent_test/opensource_insight/repo.csv"
+    repo_csv =""
 
     with open(repo_csv, "r") as f:
         reader = csv.reader(f)
@@ -93,7 +91,7 @@ def solve():
             fetch_dependencies(package_name, version, language)
 
 def solve1():
-    repo_csv ="/home/yixiang/zyx1/Agent_test/opensource_insight/repo.csv"
+    repo_csv =""
 
     with open(repo_csv, "r") as f:
         reader = csv.reader(f)

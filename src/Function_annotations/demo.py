@@ -9,8 +9,8 @@ import os
 import json
 from utils import parse_text_to_json,ZILINGYU_ANS
 import random
-FEATURE_FILE_PATH = r"/home/zyx/open_insight/Qwen-8b-ans1"
-FUNCTION_FILE_PATH = r"/home/zyx/open_insight/Scripts/doc_extract/test_data"
+FEATURE_FILE_PATH = r"src\Feature_word_paradigm_generation\test_data"
+FUNCTION_FILE_PATH = r"src\Function_annotations\test_data"
 class TextAnalysisApp:
     def __init__(self):
         self.demo = self.build_interface()

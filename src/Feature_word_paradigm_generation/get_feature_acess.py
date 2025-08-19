@@ -1,7 +1,5 @@
 
 '''
-# nohup python /home/zyx/open_insight/Scripts/llm_extract/test.py > /home/zyx/open_insight/Scripts/llm_extract/feature.log 2>&1 &
-[1] 831535
 
 '''
 from openai import OpenAI
@@ -104,7 +102,7 @@ def load_data():
 
 
 
-def process_LLM_feature_extract(item_chunks,save_path=r"/home/zyx/open_insight/output_pytorch_50.txt"):
+def process_LLM_feature_extract(item_chunks,save_path=r"/output_pytorch_50.txt"):
     # if not os.path.exists(save_path):
     #     pass
     # else:
@@ -190,8 +188,8 @@ def process_LLM_feature_extract(item_chunks,save_path=r"/home/zyx/open_insight/o
                     """
 
     client = OpenAI(
-                base_url="https://ai.gitee.com/v1",
-                api_key="LV41QCCDGLTQLUUUBAM8KXZKCQOS4ZTUTQDGH461",
+                base_url="",
+                api_key="",
     )
     content = ""
     save_name_tmp = os.path.join(save_path, "output_tmp.txt")
