@@ -18,9 +18,9 @@ ZILINGYU_ANS = {
 }
 FEATURE_FILE_PATH = r"/home/zyx/open_insight/Qwen-8b-ans1"
 FUNCTION_FILE_PATH = r"/home/zyx/open_insight/Scripts/doc_extract/test_data"
-base_url = "https://ai.gitee.com/v1"
-# https://ai.gitee.com/dashboard/settings/tokens 获取您的访问令牌
-GITEE_AI_API_KEY = "LV41QCCDGLTQLUUUBAM8KXZKCQOS4ZTUTQDGH461"
+base_url = ""
+
+GITEE_AI_API_KEY = ""
 
 def read_json_file(file_path: str) -> Dict[str, Any]:
     """Read a JSON file and return its content."""
