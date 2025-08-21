@@ -8,8 +8,8 @@ LastEditTime: 2025-03-24 10:29:58
 '''
 import re
 import os
-from document_metric.utils import TMP_PATH,JSON_REPOPATH,clone_repo
-from document_metric.utils import save_json,load_json
+from .utils import TMP_PATH,JSON_REPOPATH,DOC_NUM_PATH,DOC_QUARTY_PATH,clone_repo, clone_repo_not_version
+from .utils import save_json,load_json
 
 REPOPATH = TMP_PATH
 
@@ -96,34 +96,31 @@ def find_doc_quarty_files(json_path):
 
 
 
-def doc_quarty_all(url,version):
+def doc_quarty_all(url,version=None):
     '''document quarty'''
-    repo_name = os.path.basename(url)+"-"+version
-    
+    if version is None:
+        repo_name = os.path.basename(url)
+    else:
+        repo_name = os.path.basename(url) + "-" + version
+
     if repo_name not in os.listdir(REPOPATH):
         print(f"Cloning {repo_name} repository...")
-        clone_repo(url,version)
-        
-    json_path = os.path.join(JSON_REPOPATH, f"{repo_name}.json")
+        if version is not None:
+            clone_repo(url,version)
+        else:
+            clone_repo_not_version(url)
 
-    if f"{repo_name}.json" not in os.listdir(JSON_REPOPATH):
-        return ValueError(f"Start by performing the document quantity metric...")
+    json_path = os.path.join(DOC_NUM_PATH, f"{repo_name}_doc_num.json")
+    
+
+    if f"{repo_name}_doc_num.json" not in os.listdir(DOC_NUM_PATH):
+        return ValueError(f"Error: Document number JSON file not found.")
 
     zh_files = find_doc_quarty_files(json_path)
+    save_json(zh_files, os.path.join(DOC_QUARTY_PATH, f'{repo_name}_doc_quarty.json'))
     return zh_files
     
 if __name__ == '__main__':
-    # file_path = r'C:\Users\zyx\Desktop\文档数量\tmp\numpy\README.md'
-    # file_path = r'tmp\pytorch\README.md'
-    # file_path = r'C:\Users\zyx\Desktop\文档数量\tmp\numpy\CONTRIBUTING.rst'
-    # doc_quarty = DocQuarty(file_path)
-    # # print(f"Word count: {doc_quarty.words}")
-    # # print(f"Picture count: {doc_quarty.pic_number}")
-    # ans = {
-    #     'Word count': doc_quarty.words,
-    #     'Picture count': doc_quarty.pic_number
-    # }
     url = "https://github.com/numpy/numpy"
     ans = doc_quarty_all(url)
-    save_json(ans, f'文档数量质量支持.json')
 

@@ -1,12 +1,9 @@
 """"""
-
 import requests
-import json
-import sys  
 import os
-import csv
-import ast
-from tqdm import tqdm
+
+from .utils import TPL_PATH, save_json
+
 def fetch_dependencies(package_name, version,language):
     """
     Fetch dependencies from deps.dev API and save to a JSON file.
@@ -28,7 +25,7 @@ def fetch_dependencies(package_name, version,language):
         case "JavaScript":
             api_url = npm_api_url
         case _:
-            # print(f"Unsupported language: {language}")
+            print(f"Unsupported language: {language}")
             return
         
     try:
@@ -55,75 +52,31 @@ def fetch_dependencies(package_name, version,language):
             ans["description"] = dependency.get("description", "")
             res["dependencies"].append(ans)
 
-        save_name = os.path.join( f"{package_name}-{version}_dependencies.json")
-        with open(save_name, 'w') as json_file:
-            json.dump(res, json_file, indent=4)
-        
-        return True
+        save_json(res, os.path.join(TPL_PATH, f'{package_name}-{version}_dependencies.json'))
+        return res
 
-        # # Save the data to a JSON file
-        # output_file = "dependencies.json"
-        # with open(output_file, 'w') as json_file:
-        #     json.dump(dependencies_data, json_file, indent=4)
-        
-        # print(f"Dependencies for {package_name} version {version} saved to {output_file}")
-        
-    except:
-        # print(f"Error fetching dependencies: {e}")
-        with open("error_log.txt", "a") as error_file:
-            error_file.write(f"Error fetching dependencies for {package_name} version {version}\n")
-        
-        return False
+    except Exception as e:
+        print(f"Error fetching dependencies for {package_name} version {version}: {e}")
+        return {}
     
-def solve():
-    repo_csv =""
-
-    with open(repo_csv, "r") as f:
-        reader = csv.reader(f)
-        for row in tqdm(reader):
-            if row[0] == "repo":
-                continue
-            repo_url = row[0]
-            version = ast.literal_eval(row[1])[0].replace("v", "")
-            package_name = repo_url.split("/")[-1]
-            language = ast.literal_eval(row[2])
-            # print(f"Fetching dependencies for {package_name} version {version}")
-            fetch_dependencies(package_name, version, language)
-
-def solve1():
-    repo_csv =""
-
-    with open(repo_csv, "r") as f:
-        reader = csv.reader(f)
-        for row in tqdm(reader):
-            if row[0] == "repo":
-                continue
-            repo_url = row[0]
-            version_list = ast.literal_eval(row[1])#[0].replace("v", "")
-            version_old = version_list[0].replace("v", "")
-            package_name = repo_url.split("/")[-1]
-            language = ast.literal_eval(row[2])
-            # print(f"Fetching dependencies for {package_name} version {version}")
-            if f"{package_name}-{version_old}_dependencies.json" in os.listdir(r"/home/yixiang/zyx1/Agent_test/opensource_insight/data/TPC"):
-                continue
-            for version in version_list:
-                version = version.replace("v", "")
-                # print(f"Fetching dependencies for {package_name} version {version}")
-                flag = fetch_dependencies(package_name, version, language)
-                if flag:
-                    break
+def solve(repo_url, version, language):
+    package_name = repo_url.split("/")[-1]
+    if version is not None:
+        version = version.replace("v", "")
+    else:
+        print("获得依赖必须指定版本号！")
+        return {}
+    
+    if language is None:
+        print("获得依赖必须指定编程语言！")
+        return {}
+    
+    print(f"Fetching dependencies for {package_name} version {version}")
+    return fetch_dependencies(package_name, version, language)
+    
 
 if __name__ == "__main__":
-    # file_path = os.path.join(os.path.dirname(__file__), "dependencies.csv")
-    # with open(file_path, 'r') as f:
-    #     data = csv.reader(f)
-    #     for row in data:
-    #         if row[0] == "package_name":
-    #             continue
-    #         package_name = row[0]
-    #         version = row[1]
-    #         print(f"Fetching dependencies for {package_name} version {version}")
-    #         fetch_dependencies(package_name, version)
-    
-    # fetch_dependencies()
-    solve1()
+    repo_url = "https://github.com/numpy/numpy"
+    version = "v2.3.2"
+    language = "python"
+    solve(repo_url, version, language)

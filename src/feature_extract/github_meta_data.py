@@ -1,46 +1,27 @@
 import os
 import sys
-import json
 from opensearchpy import OpenSearch
-import csv
-import pandas as pd
-from tqdm import tqdm
 
+from .utils import METADATA_URL, METADATA_PATH, save_json
 
 def get_opensearch_client(opensearch_url):
-    """
-    获取 OpenSearch 客户端。
-    
-    Returns:
-        OpenSearch: OpenSearch 客户端实例。
-    """
     try:
         client = OpenSearch(
             hosts=[opensearch_url],
             use_ssl=False,
             verify_certs=False,
-            timeout=30  # 增加超时时间
+            timeout=60  # 增加超时时间
         )
         return client
     except Exception as e:
         print(f"Error connecting to OpenSearch: {e}")
         sys.exit(1)
 
-def get_query(index,repo_url):
-    """
-    获取指定仓库的主题信息。
-    
-    Args:
-        index (str): OpenSearch索引名称
-        repo_url (str): 仓库的URL
-        
-    Returns:
-        list: 包含主题的列表
-    """
+def get_query(repo_url):
     query = {
         "query": {
             "term": {
-                "repository_url": repo_url
+                "tag": repo_url
             }
         }
     }
@@ -49,14 +30,14 @@ def get_query(index,repo_url):
 
 
 class GitHubMetadata:
-    def __init__(self, opensearch_url, repo_url):
-        self.client = get_opensearch_client(opensearch_url)
+    def __init__(self, repo_url):
+        self.client = get_opensearch_client(METADATA_URL)
         self.repo_url = repo_url
 
-    def get_metadata(self,index,repo_url):
-        """        获取指定仓库的元数据。"""
+    def get_metadata(self, index, repo_url):
+        """获取指定仓库的元数据。"""
 
-        query = get_query(index, repo_url)
+        query = get_query(repo_url)
         response = self.client.search(index=index, body=query)
 
         if response['hits']['hits']:
@@ -64,7 +45,7 @@ class GitHubMetadata:
         else:
             return {}
         
-    def get_metadata(self, index):
+    def get_metadata_from_index(self, index):
         """
         获取指定索引中的所有仓库元数据。
         
@@ -100,22 +81,41 @@ class GitHubMetadata:
             "size": 1000
         }
         
-        # response = self.client.search(index=index, scroll="5m", body=scroll_query)
-        # scroll_id = response["_scroll_id"]
-
-
-        # while len(response["hits"]["hits"]):
-        #     all_metadata.extend([hit["_source"] for hit in response["hits"]["hits"]])
-        #     response = self.client.scroll(scroll_id=scroll_id, scroll="5m")
-        #     scroll_id = response["_scroll_id"]
-
         return all_metadata
     
     def get_release_notes(self):
-        """        获取指定索引中的所有仓库的发布说明。"""
-        # 获取所有仓库的元数据
-        get_metadata = self.get_metadata("github_repo_raw")
-        release_notes = []
-        for item in get_metadata:
-            release_notes.append(item.get("release_notes", ""))
-        return release_notes
+        """获取指定索引中的仓库的发布说明。"""
+        get_metadata = self.get_metadata("github-repo_raw", self.repo_url)
+        repo_name = os.path.basename(self.repo_url)
+        save_json(get_metadata, os.path.join(METADATA_PATH, f'{repo_name}_release_notes.json'))
+        return get_metadata
+
+    def get_version(self):
+        """获取指定索引中的仓库的版本信息。"""
+        import json
+        import os
+        repo_name = os.path.basename(self.repo_url)
+        json_path = os.path.join(METADATA_PATH, f"{repo_name}_release_notes.json")
+        if not os.path.exists(json_path):
+            print(f"文件不存在: {json_path}")
+            return None
+        
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # 查找版本信息
+        try:
+            releases = data.get("data", {}).get("releases", [])
+            if releases and "tag_name" in releases[0]:
+                return releases[0]["tag_name"]
+            else:
+                print("未找到版本信息")
+                return None
+        except Exception as e:
+            print(f"解析版本信息出错: {e}")
+            return None
+
+if __name__ == "__main__":
+    repo_url = "https://github.com/pytorch/pytorch"
+    metadata = GitHubMetadata(repo_url)
+    release_notes = metadata.get_release_notes()
