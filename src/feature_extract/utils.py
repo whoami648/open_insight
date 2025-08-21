@@ -1,15 +1,49 @@
 import os
-import json
 import subprocess
-from typing import List
-import re
 import logging
+import json
 
 import pandas as pd
 from opensearchpy import OpenSearch
 import shutil
 from pathlib import Path
+import configparser
 
+config = configparser.ConfigParser()
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+read_files = config.read(os.path.join(PROJECT_ROOT, 'config.ini'))
+DATA_PATH = config.get('GLOBAL_PATHS', 'tmp_path')
+SAVE_PATH = config.get('GLOBAL_PATHS', 'save_path')
+
+TMP_PATH = os.path.join(DATA_PATH,'repos_tmp')
+JSON_REPOPATH = os.path.join(SAVE_PATH,'doc')
+DOC_NUM_PATH = os.path.join(JSON_REPOPATH,'doc_num')
+DOC_QUARTY_PATH = os.path.join(JSON_REPOPATH,'doc_quarty')
+METADATA_PATH = os.path.join(SAVE_PATH,'metadata')
+TOPICS_PATH = os.path.join(SAVE_PATH, 'topics')
+TPL_PATH = os.path.join(SAVE_PATH, 'tpl')
+
+RES_PATH = os.path.join(SAVE_PATH, 'res')
+
+if not os.path.exists(TMP_PATH):
+    os.makedirs(TMP_PATH)
+if not os.path.exists(JSON_REPOPATH):
+    os.makedirs(JSON_REPOPATH)
+if not os.path.exists(DOC_NUM_PATH):
+    os.makedirs(DOC_NUM_PATH)
+if not os.path.exists(DOC_QUARTY_PATH):
+    os.makedirs(DOC_QUARTY_PATH)
+if not os.path.exists(METADATA_PATH):
+    os.makedirs(METADATA_PATH)
+if not os.path.exists(TOPICS_PATH):
+    os.makedirs(TOPICS_PATH)
+if not os.path.exists(TPL_PATH):
+    os.makedirs(TPL_PATH)
+if not os.path.exists(RES_PATH):
+    os.makedirs(RES_PATH)
+
+METADATA_URL = config.get('OPEN_CHECKService', 'open_search_url_metadata')
+TOPICS_URL = config.get('OPEN_CHECKService', 'open_search_url_topics')
 
 class LOG:
     """Logging class for handling log messages."""
@@ -118,6 +152,11 @@ def delete_oldest_dirs(base_dir: str, num_to_delete: int = 1000):
             print(f"Deleted: {d}")
         except Exception as e:
             print(f"Failed to delete {d}: {e}")
+
+def save_json(data, path):
+    with open(path, 'w') as f:
+        json.dump(data, f, indent=4)
+        return True
 
     # Example usage:
 if __name__ == "__main__":

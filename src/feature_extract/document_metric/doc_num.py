@@ -1,30 +1,9 @@
-'''
-Descripttion: get file number from a folder and a README file
-version: V1.0
-Author: zyx
-Date: 2025-01-16 17:31:20
-LastEditors: zyx
-LastEditTime: 2025-03-24 15:46:06
-'''
 import os
-from document_metric.utils import save_json,clone_repo,clone_repo_not_version,TMP_PATH,JSON_REPOPATH
+
+from .utils import save_json,clone_repo,clone_repo_not_version,TMP_PATH,JSON_REPOPATH, DOC_NUM_PATH
 import re
 
 def count_documents_from_folder(path, extensions=None)->tuple:
-    """
-    Count documents in a folder with specified extensions and return their details.
-    Args:
-        path (str): The path to the folder to search for documents.
-        extensions (list, optional): A list of file extensions to include in the count. 
-                                        Defaults to [".md", ".yaml", ".pdf", ".yml", ".html", ".doc", ".docx", ".txt", ".rst"].
-    Returns:
-        tuple: A tuple containing:
-            - document_count (int): The number of documents found.
-            - document_details (list): A list of dictionaries, each containing:
-                - "name" (str): The name of the document.
-                - "path" (str): The full path to the document.
-    """
-
     if extensions is None:
         extensions = [".md", ".yaml", ".pdf", ".yml", ".html", ".doc", ".docx",".txt",".rst"]
     
@@ -50,20 +29,6 @@ def count_documents_from_folder(path, extensions=None)->tuple:
     return document_count, document_details
 
 def count_documents_from_Readme(markdown)->tuple:
-    """
-    Counts the number of document links in a given markdown string, excluding video and image links.
-
-    Args:
-        markdown (str): The markdown content to be analyzed.
-
-    Returns:
-        tuple: A tuple containing:
-            - link_count (int): The number of document links found.
-            - links (list): A list of dictionaries, each containing:
-                - "name" (str): The name of the link (URL without the protocol).
-                - "path" (str): The full URL of the link.
-    """
-
     link_count = 0
     links = []
     video_sites = ["youtube.com", "vimeo.com", "dailymotion.com","blibli.com","img","gif","jpg","jpeg","png","svg"]
@@ -94,16 +59,6 @@ def count_documents_from_Readme(markdown)->tuple:
     return link_count, links
 
 def search_readme_in_folder(path)->tuple:
-    """
-    Searches for README files in the specified folder and returns their contents.
-    Args:
-        path (str): The path to the folder where the search will be conducted.
-    Returns:
-        tuple: A tuple containing a boolean flag and the contents of the README file.
-               flag :The boolean flag is True if a README file is found, otherwise False.
-               readme_content: The contents of the README file are returned as a string if found, otherwise an empty list.
-    """
-
     readme_files = ["README.md", "README.txt", "README.rst","README","readme.md", "readme.txt", "readme.rst","readme"]
     readme_contents = ""
     flag = False
@@ -121,37 +76,31 @@ def search_readme_in_folder(path)->tuple:
     
     return flag,readme_contents
 
-def get_documentation_links_from_repo(repo_url,version,platform='github'):
-    """
-    Clones a repository, searches for README files, counts documents, and saves the details to a JSON file.
-    Args:
-        repo_url (str): The URL of the repository to clone.
-        platform (str, optional): The platform where the repository is hosted. Defaults to 'github'.
-    Returns:
-        dict: A dictionary containing the total number of documents, details of documents found in the folder, 
-              and details of links found in the README file.
-    Raises:
-        ValueError: If the repository clone fails or if the README file is not found in the folder.
-    """
+def get_documentation_and_links_from_repo(repo_url,version=None):
+    if version is None:
+        repo_name = os.path.basename(repo_url)  # os.path.basename 获取路径中的文件名部分
+    else:
+        repo_name = os.path.basename(repo_url) + "-" + version
 
-
-
-    repo_name = os.path.basename(repo_url)+"-"+version
-    
-    if repo_name not in os.listdir(TMP_PATH):
-        flag,readme_path = clone_repo(repo_url,version)
-        if not flag:
-            ValueError("Repository clone failed.")
+    if repo_name not in os.listdir(TMP_PATH): # 查找 TMP_PATH 下所有文件夹
+        if version is not None:
+            print("begin repository clone with version")
+            flag,readme_path = clone_repo(repo_url,version)
+            if not flag:
+                ValueError("Repository clone failed.")
+            else:
+                print(f"Repository cloned to {readme_path}")
         else:
-            print(f"Repository cloned to {readme_path}")
+            print("begin repository clone without version")
+            flag,readme_path = clone_repo_not_version(repo_url)
+            if not flag:
+                ValueError("Repository without version clone failed.")
+            else:
+                print(f"Repository cloned to {readme_path}")
 
-        check_path = os.path.join(TMP_PATH, repo_name)
-        if not os.path.exists(check_path):
-            clone_repo_not_version(repo_url)
-    
     readme_path = os.path.join(TMP_PATH, repo_name)
     if readme_path:
-        # print(f"Repository has already cloned to {readme_path}")
+        print(f"Repository has already cloned to {readme_path}")
         flag,readme = search_readme_in_folder(readme_path)
     else:
         ValueError("README file not found in folder.")
@@ -166,20 +115,10 @@ def get_documentation_links_from_repo(repo_url,version,platform='github'):
         "links_document_details": links
     }
 
-    save_json(doc_number,os.path.join(JSON_REPOPATH,f'{repo_name}.json'))
+    save_json(doc_number,os.path.join(DOC_NUM_PATH,f'{repo_name}_doc_num.json'))
     return doc_number
 
 
 if __name__ == '__main__':
-    # path = r"C:\Users\zyx\Desktop\code_20\tmp\numpy"
-    # total_docs, docs_info = count_documents_from_folder(path)
-    # print(f"Total documents: {total_docs}")
-    # for doc in docs_info:
-    #     print(f"Document: {doc['name']}, Path: {doc['path']}")
-    # save_json(docs_info, 'docs_info.json')
-    # print(count_documents_from_Readme(search_readme_in_folder(r"C:\Users\zyx\Desktop\code_20\tmp\numpy")))
-    # print(search_readme_in_folder(r"C:\Users\zyx\Desktop\code_20\tmp\numpy"))
-    # print(get_documentation_links_from_repo('https://github.com/pytorch/pytorch'))
-    # print(get_documentation_links_from_repo('https://gitee.com/mirrors/opencv'))
-    print(get_documentation_links_from_repo('https://github.com/numpy/numpy'))
-    # print(get_documentation_links_from_repo('https://github.com/git-lfs/git-lfs'))
+    print(get_documentation_and_links_from_repo('https://github.com/numpy/numpy'))
+    

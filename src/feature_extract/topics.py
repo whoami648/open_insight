@@ -1,22 +1,11 @@
 import os
 import sys
-import json
 from opensearchpy import OpenSearch
-# user_name = "admin"
-# code = "opensearch"
-
-import pandas as pd
-import configparser
-import shutil
-
-config = configparser.ConfigParser()
-config.read("config.ini")  # 假设文件名为 config，但没有后缀
-print(config.sections())  # 输出为空列表 []
-OPENSEARCH = config.get("OPEN_CHECKService", "open_search_url_topics", fallback="")
+from .utils import TOPICS_URL, TOPICS_PATH, save_json
 
 
-def get_opensearch_client(opensearch_url = OPENSEARCH):
-    
+def get_opensearch_client(opensearch_url = TOPICS_URL):
+
     """
     获取 OpenSearch 客户端。
     
@@ -54,7 +43,7 @@ def get_topics(repo_url = "opensource_insight"):
                 }
             }
         },
-        "_source": [""],
+        "_source": ["topics"],
         "size": 10000
     }
     try:
@@ -74,23 +63,19 @@ def get_topics(repo_url = "opensource_insight"):
         print(f"Error fetching topics: {e}")
         return []
 
-def solve():
+def solve(repo_url):
     """
     主函数，用于获取指定仓库的主题信息。
     """
-    with open("/home/yixiang/zyx1/Agent_test/opensource_insight/repo.csv", "r") as f:
-        reader = pd.read_csv(f)
-        for row in reader.itertuples():
-            if row.repo == "repo":
-                continue
-            repo_url = row.repo
-            topics = get_topics(repo_url)
-            print(f"Repository: {repo_url}, Topics: {topics}")
+    topics = get_topics(repo_url)
+    repo_name = os.path.basename(repo_url)
+    save_json(topics, os.path.join(TOPICS_PATH, f'{repo_name}_topics.json'))
+    return topics
 
 
             
 if __name__ == "__main__":
-    topics = get_topics("https://github.com/pytorch/pytorch")
+    topics = solve("https://github.com/pytorch/pytorch")
     print("Topics:", topics)
 
 

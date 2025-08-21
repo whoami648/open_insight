@@ -1,11 +1,3 @@
-'''
-Descripttion: 
-version: V1.0
-Author: zyx
-Date: 2025-01-16 17:34:10
-LastEditors: zyx
-LastEditTime: 2025-03-04 17:44:17
-'''
 import json
 import os
 import sys
@@ -15,24 +7,30 @@ import markdown
 import configparser
 
 
+# filepath: /data/qxy/myinsight/open_insight/src/feature_extract/document_metric/utils.py
 config = configparser.ConfigParser()
-NOW_PATH =  os.path.dirname(os.path.abspath(__file__))
-config.read(os.path.join(NOW_PATH,r'config.ini'))
-GITEE_TOKEN = config.get('OPEN_CHECKService', 'GITEE_TOKEN')
-GITHUB_TOKEN = config.get('OPEN_CHECKService', 'GITHUB_TOKEN')
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+read_files = config.read(os.path.join(PROJECT_ROOT, 'config.ini'))
+GITEE_TOKEN = config.get('ACCESS_TOKENS', 'GITEE_TOKEN')
+GITHUB_TOKEN = config.get('ACCESS_TOKENS', 'GITHUB_TOKEN')
 
-
-
-DATA_PATH = config.get('OPEN_CHECKService', 'tmp_path')
+DATA_PATH = config.get('GLOBAL_PATHS', 'tmp_path')
+SAVE_PATH = config.get('GLOBAL_PATHS', 'save_path')
 
 TMP_PATH = os.path.join(DATA_PATH,'repos_tmp')
-JSON_REPOPATH = os.path.join(DATA_PATH,'json')
+JSON_REPOPATH = os.path.join(SAVE_PATH,'doc')
+DOC_NUM_PATH = os.path.join(JSON_REPOPATH,'doc_num')
+DOC_QUARTY_PATH = os.path.join(JSON_REPOPATH,'doc_quarty')
 
 
 if not os.path.exists(TMP_PATH):
     os.makedirs(TMP_PATH)
 if not os.path.exists(JSON_REPOPATH):
     os.makedirs(JSON_REPOPATH)
+if not os.path.exists(DOC_NUM_PATH):
+    os.makedirs(DOC_NUM_PATH)
+if not os.path.exists(DOC_QUARTY_PATH):
+    os.makedirs(DOC_QUARTY_PATH)
 
 def get_github_readme(repo):
     url = f'https://api.github.com/repos/{repo}/readme'
