@@ -110,7 +110,14 @@ class GitHubMetadata:
         #save_json(get_metadata, os.path.join(METADATA_PATH, f'{repo_name}_release_notes.json'))
 
         metadata_new = self.get_mes_from_metadata(get_metadata)
-        save_json(metadata_new, os.path.join(METADATA_PATH, f'{repo_name}_metadata.json'))
+        not_data = {
+            "release_notes": {},
+            "language": None,
+            "pull_title": "",
+            "commit_message": ""
+        }
+        if metadata_new != not_data:
+            save_json(metadata_new, os.path.join(METADATA_PATH, f'{repo_name}_metadata.json'))
 
         return metadata_new
 
@@ -145,8 +152,8 @@ class GitHubMetadata:
         json_path = os.path.join(METADATA_PATH, f"{repo_name}_metadata.json")
         if not os.path.exists(json_path):
             print(f"文件不存在: {json_path}")
-            return None
-        
+            return None, None
+
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 

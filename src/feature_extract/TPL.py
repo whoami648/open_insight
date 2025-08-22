@@ -26,8 +26,8 @@ def fetch_dependencies(package_name, version,language):
             api_url = npm_api_url
         case _:
             print(f"Unsupported language: {language}")
-            return f"Unsupported language: {language}"
-        
+            return {"error": f"Unsupported language: {language}"}
+
     try:
         response = requests.get(api_url)
         response.raise_for_status()  # Raise an error for bad responses
@@ -57,20 +57,20 @@ def fetch_dependencies(package_name, version,language):
 
     except Exception as e:
         print(f"Error fetching dependencies for {package_name} version {version}: {e}")
-        return {}
-    
+        return {"error": f"Error fetching dependencies for {package_name} version {version}: {e}"}
+
 def solve(repo_url, version, language):
     package_name = repo_url.split("/")[-1]
     if version is not None:
         version = version.replace("v", "")
     else:
         print("获得依赖必须指定版本号！")
-        return {}
-    
+        return {"error": "not get your version"}
+
     if language is None:
         print("获得依赖必须指定编程语言！")
-        return {}
-    
+        return {"error": "not get your language"}
+
     print(f"Fetching dependencies for {package_name} version {version}")
     return fetch_dependencies(package_name, version, language)
     

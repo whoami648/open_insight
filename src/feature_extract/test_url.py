@@ -3,6 +3,7 @@ from tqdm import tqdm
 from . import FeatureExtract
 
 if __name__ == "__main__":
-    repo_url = "https://github.com/numpy/numpy"
+    repo_url = "https://gitee.com/deep-spark/deepsparkinference"
     feature_extract = FeatureExtract(repo_url)
-    res = feature_extract.get_repo_all_mes()
+    res = feature_extract.get_topics()
+    print(res)
