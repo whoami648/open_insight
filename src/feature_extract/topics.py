@@ -1,7 +1,7 @@
 import os
 import sys
 from opensearchpy import OpenSearch
-from .utils import TOPICS_URL, TOPICS_PATH, save_json
+from .utils import TOPICS_URL, TOPICS_PATH, save_json, check_github_gitee
 
 
 def get_opensearch_client(opensearch_url = TOPICS_URL):
@@ -47,11 +47,11 @@ def get_topics(repo_url = "opensource_insight"):
         "size": 10000
     }
     try:
+        platform = check_github_gitee(repo_url)
         response = client.search(
-            index="github_event_repository*",
+            index=f"{platform}_event_repository*",
             body=query
         )
-        
         topics = []
         hits = response.get('hits', {}).get('hits', [])
         for bucket in hits:

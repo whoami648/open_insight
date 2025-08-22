@@ -18,7 +18,7 @@ def fetch_dependencies(package_name, version,language):
     c_api_url = f"https://deps.dev/_/s/c/p/{package_name}/v/{version}/dependencies"
 
     match language:
-        case "python":
+        case "Python":
             api_url = pypi_api_url
         case "Java":
             api_url = maven_api_url
@@ -26,7 +26,7 @@ def fetch_dependencies(package_name, version,language):
             api_url = npm_api_url
         case _:
             print(f"Unsupported language: {language}")
-            return
+            return f"Unsupported language: {language}"
         
     try:
         response = requests.get(api_url)

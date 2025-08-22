@@ -19,8 +19,7 @@ SAVE_PATH = config.get('GLOBAL_PATHS', 'save_path')
 
 TMP_PATH = os.path.join(DATA_PATH,'repos_tmp')
 JSON_REPOPATH = os.path.join(SAVE_PATH,'doc')
-DOC_NUM_PATH = os.path.join(JSON_REPOPATH,'doc_num')
-DOC_QUARTY_PATH = os.path.join(JSON_REPOPATH,'doc_quarty')
+DOC_NUM_PATH = JSON_REPOPATH
 
 
 if not os.path.exists(TMP_PATH):
@@ -29,8 +28,6 @@ if not os.path.exists(JSON_REPOPATH):
     os.makedirs(JSON_REPOPATH)
 if not os.path.exists(DOC_NUM_PATH):
     os.makedirs(DOC_NUM_PATH)
-if not os.path.exists(DOC_QUARTY_PATH):
-    os.makedirs(DOC_QUARTY_PATH)
 
 def get_github_readme(repo):
     url = f'https://api.github.com/repos/{repo}/readme'

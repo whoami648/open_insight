@@ -17,8 +17,7 @@ SAVE_PATH = config.get('GLOBAL_PATHS', 'save_path')
 
 TMP_PATH = os.path.join(DATA_PATH,'repos_tmp')
 JSON_REPOPATH = os.path.join(SAVE_PATH,'doc')
-DOC_NUM_PATH = os.path.join(JSON_REPOPATH,'doc_num')
-DOC_QUARTY_PATH = os.path.join(JSON_REPOPATH,'doc_quarty')
+DOC_NUM_PATH = JSON_REPOPATH
 METADATA_PATH = os.path.join(SAVE_PATH,'metadata')
 TOPICS_PATH = os.path.join(SAVE_PATH, 'topics')
 TPL_PATH = os.path.join(SAVE_PATH, 'tpl')
@@ -31,8 +30,6 @@ if not os.path.exists(JSON_REPOPATH):
     os.makedirs(JSON_REPOPATH)
 if not os.path.exists(DOC_NUM_PATH):
     os.makedirs(DOC_NUM_PATH)
-if not os.path.exists(DOC_QUARTY_PATH):
-    os.makedirs(DOC_QUARTY_PATH)
 if not os.path.exists(METADATA_PATH):
     os.makedirs(METADATA_PATH)
 if not os.path.exists(TOPICS_PATH):
@@ -157,6 +154,14 @@ def save_json(data, path):
     with open(path, 'w') as f:
         json.dump(data, f, indent=4)
         return True
+
+def check_github_gitee(url):
+    if 'github.com' in url:
+        return 'github'
+    elif 'gitee.com' in url:
+        return 'gitee'
+    else:
+        return None
 
     # Example usage:
 if __name__ == "__main__":
