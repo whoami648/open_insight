@@ -1,5 +1,5 @@
 from .document_metric import Industry_Support
-from .utils import save_json, RES_PATH
+from .utils import save_json, RES_PATH, FILENAME_PATH, get_all_unique_filenames
 from .github_meta_data import GitHubMetadata
 from .TPL import solve as solve_tpl
 from .topics import solve as solve_topics
@@ -15,10 +15,13 @@ class FeatureExtract:
         self.topics = {}
         self.tpl = {}
         self.doc = {}
+        self.path = None
 
     def get_doc(self):
         dm = Industry_Support(self.repo_url, self.version)
         self.doc = dm.get_doc_all_mes()
+        self.path = dm.get_path()
+        print(f"path is {self.path}")
         return self.doc
 
     def get_topics(self):
@@ -44,13 +47,18 @@ class FeatureExtract:
         self.tpl = tpl
         return self.tpl
 
+    def get_all_filenames(self):
+        list_all = get_all_unique_filenames(self.path)
+        save_json(list_all, os.path.join(FILENAME_PATH, f'{self.repo_url.split("/")[-1]}_filenames.json'))
+        return list_all
 
     def get_repo_all_mes(self):
         res =  {
             "doc": self.get_doc(),
             "topics": self.get_topics(),
             "metadata": self.get_metadata(),
-            "tpl": self.get_tpl()
+            "tpl": self.get_tpl(),
+            "filenames": self.get_all_filenames()
         }
         save_json(res, os.path.join(RES_PATH, f'{self.repo_url.split("/")[-1]}.json'))
         return res
