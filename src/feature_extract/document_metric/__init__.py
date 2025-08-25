@@ -1,6 +1,4 @@
-from .doc_quarty import doc_quarty_all
 from .doc_num import get_documentation_and_links_from_repo
-from .utils import save_json
 import os
 
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -10,9 +8,9 @@ class Industry_Support:
         self.repo_url = repo_url
         self.version = version
         self.doc_number = {}
-        self.doc_quarty = {}
+        #self.doc_quarty = {}
         self.doc_number = get_documentation_and_links_from_repo(self.repo_url,self.version) # 字典格式
-        self.doc_quarty = doc_quarty_all(self.repo_url,self.version)
+        #self.doc_quarty = doc_quarty_all(self.repo_url,self.version)
 
     def get_doc_quarty(self):
         return self.doc_quarty
@@ -21,8 +19,5 @@ class Industry_Support:
         return self.doc_number
     
     def get_doc_all_mes(self):
-        return {
-            "doc_quarty": self.get_doc_quarty(),
-            "doc_number": self.get_doc_number()
-        }
+        return self.get_doc_number()
 

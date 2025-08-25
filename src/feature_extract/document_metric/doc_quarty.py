@@ -8,7 +8,7 @@ LastEditTime: 2025-03-24 10:29:58
 '''
 import re
 import os
-from .utils import TMP_PATH,JSON_REPOPATH,DOC_NUM_PATH,DOC_QUARTY_PATH,clone_repo, clone_repo_not_version
+from .utils import TMP_PATH,JSON_REPOPATH,DOC_NUM_PATH,clone_repo, clone_repo_not_version
 from .utils import save_json,load_json
 
 REPOPATH = TMP_PATH
@@ -117,7 +117,7 @@ def doc_quarty_all(url,version=None):
         return ValueError(f"Error: Document number JSON file not found.")
 
     zh_files = find_doc_quarty_files(json_path)
-    save_json(zh_files, os.path.join(DOC_QUARTY_PATH, f'{repo_name}_doc_quarty.json'))
+    #save_json(zh_files, os.path.join(DOC_QUARTY_PATH, f'{repo_name}_doc_quarty.json'))
     return zh_files
     
 if __name__ == '__main__':

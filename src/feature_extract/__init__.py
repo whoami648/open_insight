@@ -30,8 +30,12 @@ class FeatureExtract:
         metadata = GitHubMetadata(self.repo_url)
         self.github_metadata = metadata.get_release_notes()
         if self.version is None:
-            self.version = metadata.get_version()
+            self.version, _ = metadata.get_version_and_language()
             print(f"get version is {self.version}")
+
+        if self.language is None:
+            _, self.language = metadata.get_version_and_language()
+            print(f"get language is {self.language}")
 
         return self.github_metadata
 

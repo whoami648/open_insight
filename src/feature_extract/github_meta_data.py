@@ -2,7 +2,7 @@ import os
 import sys
 from opensearchpy import OpenSearch
 
-from .utils import METADATA_URL, METADATA_PATH, save_json
+from .utils import METADATA_URL, METADATA_PATH, save_json, check_github_gitee
 
 def get_opensearch_client(opensearch_url):
     try:
@@ -28,6 +28,17 @@ def get_query(repo_url):
     
     return query
 
+def get_query_repo_name(repo_url):
+    query = {
+        "query": {
+            "term": {
+                "repo_name": f"{repo_url}.git"
+            }
+        }
+    }
+    
+    return query
+
 
 class GitHubMetadata:
     def __init__(self, repo_url):
@@ -36,8 +47,10 @@ class GitHubMetadata:
 
     def get_metadata(self, index, repo_url):
         """获取指定仓库的元数据。"""
-
-        query = get_query(repo_url)
+        if index == "github-git_enriched" or index == "gitee-git_enriched":
+            query = get_query_repo_name(repo_url)
+        else:
+            query = get_query(repo_url)
         response = self.client.search(index=index, body=query)
 
         if response['hits']['hits']:
@@ -85,37 +98,80 @@ class GitHubMetadata:
     
     def get_release_notes(self):
         """获取指定索引中的仓库的发布说明。"""
-        get_metadata = self.get_metadata("github-repo_raw", self.repo_url)
-        repo_name = os.path.basename(self.repo_url)
-        save_json(get_metadata, os.path.join(METADATA_PATH, f'{repo_name}_release_notes.json'))
-        return get_metadata
+        platform = check_github_gitee(self.repo_url)
 
-    def get_version(self):
-        """获取指定索引中的仓库的版本信息。"""
+        get_metadata = {
+            "release_notes": self.get_metadata(f"{platform}-repo_raw", self.repo_url),
+            "pull_title": self.get_metadata(f"{platform}-event_enriched", self.repo_url),
+            "commit_message": self.get_metadata(f"{platform}-git_enriched", self.repo_url),
+        }
+        
+        repo_name = os.path.basename(self.repo_url)
+        #save_json(get_metadata, os.path.join(METADATA_PATH, f'{repo_name}_release_notes.json'))
+
+        metadata_new = self.get_mes_from_metadata(get_metadata)
+        not_data = {
+            "release_notes": {},
+            "language": None,
+            "pull_title": "",
+            "commit_message": ""
+        }
+        if metadata_new != not_data:
+            save_json(metadata_new, os.path.join(METADATA_PATH, f'{repo_name}_metadata.json'))
+
+        return metadata_new
+
+    def get_mes_from_metadata(self, get_metadata):
+        """从元数据中提取所需的信息。"""
+        metadata_new = {
+            "release_notes": {},
+            "language": None,
+            "pull_title": "",
+            "commit_message": ""
+        }
+        try:
+            releases = get_metadata.get("release_notes", {}).get("data", {}).get("releases", [])
+            metadata_new["release_notes"] = {
+                "version": releases[0].get("tag_name", ""),
+                "body": releases[0].get("body", "")
+            }
+            metadata_new["language"] = get_metadata.get("release_notes", {}).get("data", {}).get("language", None)
+            metadata_new["pull_title"] = get_metadata.get("pull_title", {}).get("title", "")
+            metadata_new["commit_message"] = get_metadata.get("commit_message", {}).get("message", "")
+            return metadata_new
+        except Exception as e:
+            print(f"提取元数据时出错: {e}")
+
+        return metadata_new
+
+    def get_version_and_language(self):
+        """获取指定索引中的仓库的版本信息和编程语言。"""
         import json
         import os
         repo_name = os.path.basename(self.repo_url)
-        json_path = os.path.join(METADATA_PATH, f"{repo_name}_release_notes.json")
+        json_path = os.path.join(METADATA_PATH, f"{repo_name}_metadata.json")
         if not os.path.exists(json_path):
             print(f"文件不存在: {json_path}")
-            return None
-        
+            return None, None
+
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         # 查找版本信息
         try:
-            releases = data.get("data", {}).get("releases", [])
-            if releases and "tag_name" in releases[0]:
-                return releases[0]["tag_name"]
+            release = data.get("release_notes", {})
+            if release and "version" in release:
+                version = release["version"]
+                language = data.get("language", None)
+                return version, language
             else:
-                print("未找到版本信息")
-                return None
+                print("未找到信息")
+                return None, None
         except Exception as e:
             print(f"解析版本信息出错: {e}")
-            return None
+            return None, None
 
 if __name__ == "__main__":
-    repo_url = "https://github.com/pytorch/pytorch"
+    repo_url = "https://gitee.com/JianYong0726/ragflow"
     metadata = GitHubMetadata(repo_url)
     release_notes = metadata.get_release_notes()
