@@ -5,5 +5,4 @@ from . import FeatureExtract
 if __name__ == "__main__":
     repo_url = "https://gitee.com/deep-spark/deepsparkinference"
     feature_extract = FeatureExtract(repo_url)
-    res = feature_extract.get_topics()
-    print(res)
+    res = feature_extract.get_repo_all_mes()

@@ -1,4 +1,4 @@
-from .doc_num import get_documentation_and_links_from_repo
+from .doc_num import get_documentation_and_links_from_repo, get_readme_path
 import os
 
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -11,6 +11,7 @@ class Industry_Support:
         #self.doc_quarty = {}
         self.doc_number = get_documentation_and_links_from_repo(self.repo_url,self.version) # 字典格式
         #self.doc_quarty = doc_quarty_all(self.repo_url,self.version)
+        self.path = get_readme_path(self.repo_url)
 
     def get_doc_quarty(self):
         return self.doc_quarty
@@ -20,4 +21,7 @@ class Industry_Support:
     
     def get_doc_all_mes(self):
         return self.get_doc_number()
+    
+    def get_path(self):
+        return self.path
 

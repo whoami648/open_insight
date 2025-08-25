@@ -21,6 +21,7 @@ DOC_NUM_PATH = JSON_REPOPATH
 METADATA_PATH = os.path.join(SAVE_PATH,'metadata')
 TOPICS_PATH = os.path.join(SAVE_PATH, 'topics')
 TPL_PATH = os.path.join(SAVE_PATH, 'tpl')
+FILENAME_PATH = os.path.join(SAVE_PATH, 'filenames')
 
 RES_PATH = os.path.join(SAVE_PATH, 'res')
 
@@ -38,6 +39,8 @@ if not os.path.exists(TPL_PATH):
     os.makedirs(TPL_PATH)
 if not os.path.exists(RES_PATH):
     os.makedirs(RES_PATH)
+if not os.path.exists(FILENAME_PATH):
+    os.makedirs(FILENAME_PATH)
 
 METADATA_URL = config.get('OPEN_CHECKService', 'open_search_url_metadata')
 TOPICS_URL = config.get('OPEN_CHECKService', 'open_search_url_topics')
@@ -162,6 +165,20 @@ def check_github_gitee(url):
         return 'gitee'
     else:
         return None
+
+def get_all_unique_filenames(folder_path):
+    """
+    获取指定文件夹及其所有子目录下的所有文件名（不含路径），去重后返回列表。
+    Args:
+        folder_path (str): 文件夹路径
+    Returns:
+        list: 去重后的文件名列表
+    """
+    unique_names = set()
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            unique_names.add(file)
+    return list(unique_names)
 
     # Example usage:
 if __name__ == "__main__":

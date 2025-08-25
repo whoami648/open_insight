@@ -118,6 +118,12 @@ def get_documentation_and_links_from_repo(repo_url,version=None):
     save_json(doc_number,os.path.join(DOC_NUM_PATH,f'{repo_name}_doc_num.json'))
     return doc_number
 
+def get_readme_path(repo_url):
+    repo_name = os.path.basename(repo_url)
+    readme_path = os.path.join(TMP_PATH, repo_name)
+    if os.path.exists(readme_path):
+        return readme_path
+    
 
 if __name__ == '__main__':
     print(get_documentation_and_links_from_repo('https://github.com/numpy/numpy'))
