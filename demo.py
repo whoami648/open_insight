@@ -1,3 +1,6 @@
+import os
+os.environ['GRADIO_TEMP_DIR'] = os.path.expanduser('~/.gradio/tmp')
+
 import gradio as gr
 from wordcloud import WordCloud
 import os

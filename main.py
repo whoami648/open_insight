@@ -190,19 +190,14 @@ def main(repo_name, version=None):
     logging.info("All tasks completed successfully.")
 
 if __name__ == "__main__":
-    # main()
-    # print(feature_extract("https://github.com/numpy/numpy","2.3.2"))
-    # import time
-    # start_time = time.time()
-    # repo_name = "https://github.com/numpy/numpy"
-    # version = "v2.3.2"
-    # function_annotations(repo_name, version)
-    # end_time = time.time()
-    # logging.info(f"Total time taken: {end_time - start_time} seconds")
-    # clean()
     import time
     start_time = time.time()
-    main()
+    # 新增参数解析
+    if len(sys.argv) < 2:
+        print("用法: python main.py <repo_name> [version]")
+        sys.exit(1)
+    repo_url = sys.argv[1]
+    version = sys.argv[2] if len(sys.argv) > 2 else None
+    main(repo_url, version)
     end_time = time.time()
     logging.info(f"Total time taken: {end_time - start_time} seconds")
-    # main()
