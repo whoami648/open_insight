@@ -9,7 +9,7 @@ import json
 
 # 全局变量
 config = configparser.ConfigParser()
-config.read(os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.ini"))
+config.read(os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.ini"), encoding="utf-8")
 # src/llm.py
 # 领域细分
 DOMAIN = config.get('DEFAULT', 'domain', fallback=None)
@@ -171,7 +171,7 @@ class LLMOpenInsight(OpenAI):
 
         logging.info("Starting LLM feature extraction...")
 
-        meta_name = f"{self.repo_url.replace('https://github.com/', '').replace('https://gitee.com/', '_').replace('/', '_')}"
+        meta_name = f"{self.repo_url.replace('https://github.com/', '').replace('https://gitee.com/', '').replace('/', '_')}"
         meta_feature_path = os.path.join(WORD_PARADIGM_GENERATION_PATH, meta_name)
 
 
@@ -189,7 +189,7 @@ class LLMOpenInsight(OpenAI):
         logging.info("Starting function annotations reading...")
 
         # 获取功能路径
-        function_annotations_name = self.repo_url.replace('https://github.com/', '').replace('https://gitee.com/', '_').replace('/', '_')
+        function_annotations_name = self.repo_url.replace('https://github.com/', '').replace('https://gitee.com/', '').replace('/', '_')
         function_path = os.path.join(FUNCTION_ANNOTATIONS_PATH, function_annotations_name)
 
         if not os.path.exists(function_path):

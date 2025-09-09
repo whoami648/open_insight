@@ -10,7 +10,8 @@ import configparser
 # filepath: /data/qxy/myinsight/open_insight/src/feature_extract/document_metric/utils.py
 config = configparser.ConfigParser()
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-read_files = config.read(os.path.join(PROJECT_ROOT, 'config.ini'))
+with open(os.path.join(PROJECT_ROOT, 'config.ini'), 'r', encoding='utf-8') as f:
+    config.read_file(f)
 GITEE_TOKEN = config.get('ACCESS_TOKENS', 'GITEE_TOKEN')
 GITHUB_TOKEN = config.get('ACCESS_TOKENS', 'GITHUB_TOKEN')
 

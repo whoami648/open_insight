@@ -10,7 +10,7 @@ from tqdm import tqdm
 import configparser
 config = configparser.ConfigParser()
 config_path = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-config.read(os.path.join(config_path, "config.ini")) # 假设文件名为 config，但没有后缀
+config.read(os.path.join(config_path, "config.ini"), encoding="utf-8") # 假设文件名为 config，但没有后缀
 
 # 读取配置项，提供默认值以防止KeyError
 MODEL_NAME = config.get("DEFAULT", "model_name", fallback="")

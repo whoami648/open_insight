@@ -10,7 +10,7 @@ import configparser
 import time
 import random
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('config.ini', encoding="utf-8")
 
 
 TMP_PATH = config.get('GLOBAL_PATHS', 'tmp_path', fallback='tmp')

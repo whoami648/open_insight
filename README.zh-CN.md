@@ -38,6 +38,8 @@ open_search_url_topics =
 
 请将 `YOUR_API_KEY_HERE` 替换为实际的 API 密钥。
 
+此外，还需要解决 config 文件的编码问题。请确保您的 config 文件编码为 utf-8，并且确保文件中没有 BOM 头。
+
 ## 使用项目
 
 ### 在命令行使用
@@ -47,6 +49,8 @@ open_search_url_topics =
 `python main.py {repo_url} {version}`
 
 比如：`python main.py https://github.com/AgentOps-AI/agentops 0.4.13`
+或者 `python main.py python main.py https://gitee.com/dromara/easyAi v1.4.9`
+或者 `python main.py https://gitee.com/dromara/easyAi`
 
 ### 在 gradio 图形化页面使用
 

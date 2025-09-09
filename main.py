@@ -11,7 +11,7 @@ from src.Function_annotations import Doc_agent
 from src.llm import LLMOpenInsight
 import configparser
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('config.ini', encoding='utf-8')
 TMP_PATH = config.get('GLOBAL_PATHS', 'tmp_path', fallback='tmp')
 if not os.path.exists(TMP_PATH):    
     os.makedirs(TMP_PATH)
@@ -49,7 +49,7 @@ def function_annotations(repo_name, version):
     function_annotations_path = os.path.join(TMP_PATH,"doc")
     repo_url = repo_name
     
-    repo_name = f"{repo_name.replace('https://github.com/', '').replace('http://gitee.com/', '').replace('.git', '').replace('/', '_')}"
+    repo_name = f"{repo_name.replace('https://github.com/', '').replace('https://gitee.com/', '').replace('.git', '').replace('/', '_')}"
     if version is not None:
         doc_path = os.path.join(function_annotations_path, repo_name+"-"+version+"_doc_num.json")
     else:
@@ -107,7 +107,7 @@ def clean():
 def generate_open_insight_prompt(repo_url,version=None):
     llm = LLMOpenInsight(repo_url)
     save_path = "./results"
-    save_name = repo_url.replace('https://github.com/', '').replace('http://gitee.com/', '').replace('.git', '').replace('/', '_')
+    save_name = repo_url.replace('https://github.com/', '').replace('https://gitee.com/', '').replace('.git', '').replace('/', '_')
     save_name_tmp = os.path.join(save_path, f"{save_name}.txt")
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -138,7 +138,7 @@ def main(repo_name, version=None):
     logging.info("Feature extraction completed.")
     logging.info("***********************************************************")
 
-    if args.repo_name.replace('https://github.com/', '').replace('http://gitee.com/', '').replace('.git', '').replace('/', '_') in os.listdir("data/word_paradigm_generation"):
+    if args.repo_name.replace('https://github.com/', '').replace('https://gitee.com/', '').replace('.git', '').replace('/', '_') in os.listdir("data/word_paradigm_generation"):
         logging.info(f"Repository {args.repo_name} has already been processed.")
     else:
 

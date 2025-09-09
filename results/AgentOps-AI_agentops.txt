@@ -21,3 +21,14 @@
 #### 3. 其他潜在关联域说明  
 尽管未直接提及计算机视觉或多模态处理场景但仍需注意以下可能性:  
 - 若未来扩展至图像/视频内容分析则可纳入"计算机视觉(CV)"范畴  
+
+
+### 宏领域技术领域：**AI技术领域**
+### 细粒度技术分类：
+1. **生成式人工智能 (AIGC)**  
+   - 特征词: `AgentOps`, `LangChain`, `OpenAi`, `Mistral`, `LlamaIndex`  
+   - 原因: 项目核心定位为"提供Agent可观测性/调试/评估/监控工具"并深度集成`LangChain`系列+`OpenAi/Mistral/LlamaIndex`等主流AIGC生态组件；通过`.ipynb`示例展示"SwarmZero AI"类多Agent系统调用流程——典型AIGC应用场景  
+
+2. **决策与规划**  
+   - 特征词: `LLM Cost Management`, `Session Replays`, `Benchmarking (1000+ evals)`  
+   - 原因: 明确解决"LLM

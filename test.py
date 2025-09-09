@@ -28,7 +28,7 @@ def solve():
                 else:
                     print(f"Invalid line format: {line}")
                     continue
-                if repo_name.replace('https://github.com/', '').replace('http://gitee.com/', '').replace('.git', '').replace('/', '_') in solved:
+                if repo_name.replace('https://github.com/', '').replace('https://gitee.com/', '').replace('.git', '').replace('/', '_') in solved:
                     print(f"Repository {repo_name} has already been processed.")
                     continue
                 print(f"Processing repository: {repo_name} with version: {version}")

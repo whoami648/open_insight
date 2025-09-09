@@ -11,7 +11,8 @@ import configparser
 
 config = configparser.ConfigParser()
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-read_files = config.read(os.path.join(PROJECT_ROOT, 'config.ini'))
+with open(os.path.join(PROJECT_ROOT, 'config.ini'), 'r', encoding='utf-8') as f:
+    config.read_file(f)
 DATA_PATH = config.get('GLOBAL_PATHS', 'tmp_path')
 SAVE_PATH = config.get('GLOBAL_PATHS', 'tmp_path')
 

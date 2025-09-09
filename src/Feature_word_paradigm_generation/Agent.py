@@ -1,4 +1,3 @@
-
 from openai import OpenAI
 import pandas as pd
 import os
@@ -8,21 +7,21 @@ from multiprocessing import Pool
 import multiprocessing
 import configparser
 import json
+from functools import partial
 
 # 全局变量
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('config.ini', encoding='utf-8')
 OPENAI_API_KEY = config.get('OPEN_CHECKService', 'openai_api_key', fallback=None)
 BASE_URL = config.get('OPEN_CHECKService', 'openai_api_url', fallback=None)
 DOMAIN = config.get('DEFAULT', 'domain', fallback=None)
 MODEL_NAME = config.get('DEFAULT', 'model_name', fallback="Qwen3-8B")
 TMP_PATH = config.get("GLOBAL_PATHS", "tmp_path", fallback="/tmp")
 FEATURE_PATH = os.path.join(TMP_PATH, "res")
-WORD_PARADIGM_GENERATION_PATH = os.path.join(TMP_PATH, "word_paradigm_generation") # 词范式生成
-SAVE_PATH = WORD_PARADIGM_GENERATION_PATH # 词范式生成结果保存路径
+WORD_PARADIGM_GENERATION_PATH = os.path.join(TMP_PATH, "word_paradigm_generation")  # 词范式生成
+SAVE_PATH = WORD_PARADIGM_GENERATION_PATH  # 词范式生成结果保存路径
 if not os.path.exists(SAVE_PATH):
     os.makedirs(SAVE_PATH)
-
 
 
 class FeatureWordParadigm(OpenAI):
@@ -33,24 +32,26 @@ class FeatureWordParadigm(OpenAI):
         self.domain = DOMAIN
         self.repo_url = repo_url
         self.version = version
-        self.save_name = os.path.join(SAVE_PATH, f"{self.repo_url.replace('https://github.com/', '').replace('http://gitee.com/', '').replace('.git', '').replace('/', '_')}")
-
+        self.save_name = os.path.join(SAVE_PATH,
+                                      f"{self.repo_url.replace('https://github.com/', '').replace('https://gitee.com/', '').replace('.git', '').replace('/', '_')}")
 
     def run(self):
         item_chunks = self.load_data()
         content = self.LLM_feature_extract(item_chunks, save_path=self.save_name)
 
         return content
-        
+
         # '/tmp/res/numpy_numpy_v2.3.2.json'
 
     def load_data(self):
         if self.version is None:
-            feature_name = self.repo_url.replace('https://github.com/', '').replace('http://gitee.com/', '').replace('.git', '').replace('/', '_')
+            feature_name = self.repo_url.replace('https://github.com/', '').replace('https://gitee.com/', '').replace(
+                '.git', '').replace('/', '_')
         else:
-            feature_name = self.repo_url.replace('https://github.com/', '').replace('http://gitee.com/', '').replace('.git', '').replace('/', '_')+"_"+f"{self.version}"
-        
-        feature_path = os.path.join(FEATURE_PATH,  f'{feature_name}.json')
+            feature_name = self.repo_url.replace('https://github.com/', '').replace('https://gitee.com/', '').replace(
+                '.git', '').replace('/', '_') + "_" + f"{self.version}"
+
+        feature_path = os.path.join(FEATURE_PATH, f'{feature_name}.json')
         with open(feature_path, 'r') as f:
             data = json.load(f)
         # # 测试
@@ -59,25 +60,24 @@ class FeatureWordParadigm(OpenAI):
         meadata = data.get('metadata', [])
         topics = data.get('topics', [])
         repo_files = set(data.get('filenames', []))
-        with open(os.path.join(TMP_PATH,r"filter_data.json"), 'r') as f:
+        with open(os.path.join(TMP_PATH, r"filter_data.json"), 'r') as f:
             filter_list = json.load(f)
-        filter_dict = list(repo_files-set(filter_list))
+        filter_dict = list(repo_files - set(filter_list))
         meadata1 = ""
 
-        for key,value in meadata.items():
-            if key =="release_notes":
+        for key, value in meadata.items():
+            if key == "release_notes":
                 meadata1 += f"release_data:{value.get('body', '').replace('\n', '').replace('\r', '').replace('\"', '')},"
             else:
                 meadata1 += f"{key}:{value},"
         meadata = meadata1
 
-
-        item = f"请你判断提取一下这个输入，repo_name:{repo_name},"+f"{meadata}"+f",topics:{",".join(topics)}"+f",files:{','.join(filter_dict)}"
+        item = f"请你判断提取一下这个输入，repo_name:{repo_name}," + f"{meadata}" + f",topics:{",".join(topics)}" + f",files:{','.join(filter_dict)}"
 
         item_chunks = self.chunk_text(item)
         return item_chunks
 
-    def chunk_text(self,text, max_length=100000):
+    def chunk_text(self, text, max_length=100000):
         chunks = []
         while len(text) > max_length:
             split_pos = text.rfind(',', 0, max_length)
@@ -89,8 +89,7 @@ class FeatureWordParadigm(OpenAI):
             chunks.append(text)
         return chunks
 
-
-    def df_to_dict(self,df):
+    def df_to_dict(self, df):
         result = {}
         for _, row in df.iterrows():
             key = row.iloc[0]
@@ -100,7 +99,7 @@ class FeatureWordParadigm(OpenAI):
             result[key] = ", ".join(value)
         return result
 
-    def LLM_feature_extract(self,item_chunks,save_path=r"/output_pytorch_50.txt"):
+    def LLM_feature_extract(self, item_chunks, save_path=r"/output_pytorch_50.txt"):
         # if not os.path.exists(save_path):
         #     pass
         # else:
@@ -120,7 +119,7 @@ class FeatureWordParadigm(OpenAI):
 
 
                         例子1：
-                        
+
                         输入：repo_list:https://github.com/minoca/os，repo_name:minoca,repo_version:1.0.0, release_data:[下一代操作系统], PR_data:[], commit_data:[提交了C代码], language:C, files:['kernel.c', 'fs.c']
                         输出：### 输入分析
                             **1. 仓库链接和名称**：
@@ -182,14 +181,14 @@ class FeatureWordParadigm(OpenAI):
                         输出： AI技术领域。原因是该项目使用了PyTorch框架，主要用于深度学习和计算机视觉任务。同时，该项目的代码主要使用Python编写，包含多个重要的Python文件。
 
 
-                        
+
                         """
 
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         client = OpenAI(
-                    base_url= BASE_URL,
-                    api_key= OPENAI_API_KEY,
+            base_url=BASE_URL,
+            api_key=OPENAI_API_KEY,
         )
         content = ""
         save_name_tmp = os.path.join(save_path, "output_tmp.txt")
@@ -197,30 +196,33 @@ class FeatureWordParadigm(OpenAI):
 
         for item in item_chunks:
             response = client.chat.completions.create(
-            messages=[
-                {
-                "role": "system",
-                "content": f"{prompts} "
-                },
-                {
-                "role": "user",
-                "content": item
-                }
-            ],
+                messages=[
+                    {
+                        "role": "system",
+                        "content": f"{prompts} "
+                    },
+                    {
+                        "role": "user",
+                        "content": item
+                    }
+                ],
                 model=MODEL_NAME,
                 stream=True,
                 max_tokens=1024,
                 temperature=0.3,
                 top_p=0.8,
                 extra_body={
-            "top_k": 20,
-            },
-            frequency_penalty=1.1,
+                    "top_k": 20,
+                },
+                frequency_penalty=1.1,
             )
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
             # for chunk in response:
-            
+            """
+            为什么有多个 chunk? 因为用了 stream=True, 大模型会边生成边返回, 每次返回一小段(chunk), 直到全部生成完毕。
+
+            """
             with open(save_name_tmp, "a+", encoding="utf-8") as f:
                 for chunk in response:
                     if len(chunk.choices) and chunk.choices[0].delta.content:
@@ -239,11 +241,11 @@ class FeatureWordParadigm(OpenAI):
                     {
                         "role": "system",
                         "content": f"""请你针对下面的这些已经判定的技术领域和特征词进行总结，输出总结之后的技术领域的分类结果所有特征词，还有分类的原因，如果是{self.domain}领域输出结果必须包含{self.domain}技术领域这几个字.
-                        
+
                         例如：
-                        
+
                         输入：AI技术领域。原因是该项目使用了PyTorch框架，主要用于深度学习和计算机视觉任务。同时，该项目的代码主要使用Python编写，包含多个重要的Python文件。特征词：（PyTorch, 深度学习, 计算机视觉, Python）
-                        
+
                         输出：### 技术领域分类结果：AI技术领域  
                                 #### 所有特征词汇总（去重后）：  
                                 1. **PyTorch**  
@@ -309,36 +311,36 @@ class FeatureWordParadigm(OpenAI):
                 frequency_penalty=1.1,
             )
 
-
             with open(save_name, "a+", encoding="utf-8") as f:
                 for chunk in response:
                     if len(chunk.choices) and chunk.choices[0].delta.content:
-                    # print(chunk.choices[0].delta.content, end="", flush=True)
-                   
+                        # print(chunk.choices[0].delta.content, end="", flush=True)
+
                         f.write(chunk.choices[0].delta.content)
                     else:
                         continue
 
         return content
 
-def muti_process_feature_word_data(self,filter_data, github_meadata, topics):
+
+def muti_process_feature_word_data(self, filter_data, github_meadata, topics):
     """
     Load the data from CSV files.
-    
+
     Returns:
         pd.DataFrame: DataFrame containing the loaded data.
     """
-
 
     # filter_data = pd.read_csv(r"file_data_after_filter.csv")
     # github_meadata = pd.read_csv(r"github_metadata.csv")
     # filter_dict = dict(zip(filter_data.iloc[:, 0], filter_data.iloc[:, 1]))
 
-
-    github_meadata_dict =github_meadata
+    github_meadata_dict = github_meadata
     # list(github_meadata_dict.items())[:10]
     topics = pd.read_csv(r"topics.csv")
     topics_dict = dict(zip(topics.iloc[:, 0], topics.iloc[:, 1]))
+    filter_dict = dict(zip(filter_data.iloc[:, 0], filter_data.iloc[:, 1]))  # 这个是啥
+
     # # 测试
     # repo_name = 'https://github.com/Arthur151/ROMP'
     # item = f"请你判断提取一下这个输入，repo_name:{repo_name}"+f"{github_meadata_dict.get(repo_name, '')}"+f",topics:{topics_dict.get(repo_name, '')}"+f",files:{filter_dict.get(os.path.basename(repo_name), '')}"
@@ -347,35 +349,30 @@ def muti_process_feature_word_data(self,filter_data, github_meadata, topics):
     # save_name = f"/Qwen-8b-ans1/{repo_name.replace('https://github.com/', '').replace('/', '_')}"
     # process_LLM_feature_extract(item_chunks,save_path=save_name)
 
-    
     item_list = []
     save_name_list = []
-   
 
     # save_name_list.append(save_name)
-    
 
     for repo_name in tqdm(github_meadata_dict.keys()):
-       
-        item = f"请你判断提取一下这个输入，repo_name:{repo_name}"+f"{github_meadata_dict.get(repo_name, '')}"+f",topics:{topics_dict.get(repo_name, '')}"+f",files:{filter_dict.get(os.path.basename(repo_name), '')}"
+        item = f"请你判断提取一下这个输入，repo_name:{repo_name}" + f"{github_meadata_dict.get(repo_name, '')}" + f",topics:{topics_dict.get(repo_name, '')}" + f",files:{filter_dict.get(os.path.basename(repo_name), '')}"
         item_chunks = self.chunk_text(item)
         item_list.append(item_chunks)
         save_name = f"/Qwen-8b-ans1/{repo_name.replace('https://github.com/', '').replace('/', '_')}"
 
         save_name_list.append(save_name)
 
-
-
     params = list(zip(item_list, save_name_list))
 
     # 获取 CPU 核心数（自动适配）
-    cpu_count = multiprocessing.cpu_count()//2
+    cpu_count = multiprocessing.cpu_count() // 2
 
     # 创建进程池
     with multiprocessing.Pool(processes=cpu_count) as pool:
         # 使用 starmap 传递多个参数[1,6](@ref)
         try:
-            results = pool.starmap(process_LLM_feature_extract, params)
+            func = partial(self.LLM_feature_extract)
+            results = pool.starmap(func, params)
             with open(os.path.join(SAVE_PATH, "/result.txt"), "w", encoding="utf-8") as f:
                 for result in results:
                     f.write("\n".join(result) + "\n")
@@ -386,12 +383,14 @@ def muti_process_feature_word_data(self,filter_data, github_meadata, topics):
 
     return item_chunks
 
+
 if __name__ == "__main__":
     # item_chunks = load_data()
     # main(item_chunks)
     import time
+
     start_time = time.time()
-    FeatureWordParadigm("https://github.com/numpy/numpy","v2.3.2").run()
+    FeatureWordParadigm("https://github.com/numpy/numpy", "v2.3.2").run()
     print("Processing complete.")
     end_time = time.time()
     print(f"Total time: {end_time - start_time} seconds")

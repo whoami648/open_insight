@@ -46,6 +46,8 @@ open_search_url_topics =
 
 Please replace `YOUR_API_KEY_HERE` with the actual API key.
 
+In addition, it is necessary to address the encoding issue of the config file. Please ensure that the encoding of your config file is utf-8 and that there are no BOM headers in the file.
+
 ## Using the Project
 
 ### Using from Command Line
@@ -55,6 +57,8 @@ Run [main.py](file://E:\se_homework\open_insight\main.py), passing in the open s
 `python main.py {repo_url} {version}`
 
 For example: `python main.py https://github.com/AgentOps-AI/agentops 0.4.13`
+or `python main.py https://gitee.com/dromara/easyAi v1.4.9`
+or `python main.py https://gitee.com/dromara/easyAi`
 
 ### Using the Gradio GUI
 
